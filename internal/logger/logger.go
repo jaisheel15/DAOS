@@ -1,6 +1,5 @@
 package logger
 
-
 import (
 	"log/slog"
 	"os"
@@ -23,11 +22,8 @@ func NewLogger(level string) *slog.Logger {
 	}
 
 	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-        Level: logLevel,
-		
-    })
-	
+		Level: logLevel,
+	})
 
-    return slog.New(handler)
+	return slog.New(handler)
 }
-

@@ -16,26 +16,25 @@ import (
 	"github.com/jaisheel15/daos/internal/logger"
 )
 
-
 func main() {
-	cfg , err := config.Load()
+	cfg, err := config.Load()
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		panic(err)
 	}
-	
+
 	log := logger.NewLogger(cfg.LogLevel)
 
 	router := chi.NewRouter()
 
-	router.Get("/health/live" , func (w http.ResponseWriter, r *http.Request) {
+	router.Get("/health/live", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("alive"))
 	})
 
 	server := &http.Server{
-		Addr:  cfg.HTTPAddr,
-		Handler:  router,
+		Addr:              cfg.HTTPAddr,
+		Handler:           router,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	ctx, stop := signal.NotifyContext(
@@ -47,7 +46,7 @@ func main() {
 
 	serverErrors := make(chan error, 1)
 
-	go func(){
+	go func() {
 		log.Info("API server starting", "address", cfg.HTTPAddr)
 
 		err := server.ListenAndServe()
@@ -57,15 +56,14 @@ func main() {
 	}()
 
 	select {
-	case <-ctx.Done() :
+	case <-ctx.Done():
 		log.Info("API server shutting down")
-	
 
 	case err := <-serverErrors:
 		log.Error("API server error", "error", err)
 	}
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(shutdownCtx); err != nil {
